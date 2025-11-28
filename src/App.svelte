@@ -9,7 +9,14 @@
     let compare2 = $state(5000);
     let compare3 = $state(7000);
 
-    function computeSchedule(principal, annualPct, payment) {
+    let additionalPayment1 = $state(0);
+    let additionalPaymentMonth1 = $state(11); // December (0-indexed)
+    let additionalPayment2 = $state(0);
+    let additionalPaymentMonth2 = $state(11);
+    let additionalPayment3 = $state(0);
+    let additionalPaymentMonth3 = $state(11);
+
+    function computeSchedule(principal, annualPct, payment, additionalPayment = 0, additionalPaymentMonth = 11) {
         const monthlyRate = annualPct / 100 / 12;
         let balanceLeft = principal;
         let months = 0;
@@ -28,6 +35,13 @@
             balanceLeft = +(balanceLeft - principalPaid).toFixed(2);
             totalInterest += interest;
             months += 1;
+
+            // Apply additional payment if it's the specified month of the year
+            const currentMonth = (months - 1) % 12; // 0-indexed month in the current year
+            if (additionalPayment > 0 && currentMonth === additionalPaymentMonth && balanceLeft > 0) {
+                const additionalPrincipal = Math.min(additionalPayment, balanceLeft);
+                balanceLeft = +(balanceLeft - additionalPrincipal).toFixed(2);
+            }
 
             if (months % 12 === 0 || balanceLeft === 0) {
                 const years = Math.floor(months / 12);
@@ -59,9 +73,9 @@
     const baseline = $derived(
         computeSchedule(balance, annualRate, monthlyPayment),
     );
-    const cmp1 = $derived(computeSchedule(balance, annualRate, compare1));
-    const cmp2 = $derived(computeSchedule(balance, annualRate, compare2));
-    const cmp3 = $derived(computeSchedule(balance, annualRate, compare3));
+    const cmp1 = $derived(computeSchedule(balance, annualRate, compare1, additionalPayment1, additionalPaymentMonth1));
+    const cmp2 = $derived(computeSchedule(balance, annualRate, compare2, additionalPayment2, additionalPaymentMonth2));
+    const cmp3 = $derived(computeSchedule(balance, annualRate, compare3, additionalPayment3, additionalPaymentMonth3));
 
     const chartOptions = $derived({
         chart: { 
@@ -167,7 +181,7 @@
             </label>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <label class="block">
                 <div class="text-xs text-slate-600">Compare Payment 1</div>
                 <input
@@ -194,6 +208,104 @@
                     class="mt-2 w-full p-2 border rounded"
                 />
             </label>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="space-y-4">
+                <label class="block">
+                    <div class="text-xs text-slate-600">Additional Payment 1</div>
+                    <input
+                        type="number"
+                        bind:value={additionalPayment1}
+                        class="mt-2 w-full p-2 border rounded"
+                        placeholder="0"
+                    />
+                </label>
+                <label class="block">
+                    <div class="text-xs text-slate-600">Payment Month 1</div>
+                    <select
+                        bind:value={additionalPaymentMonth1}
+                        class="mt-2 w-full p-2 border rounded"
+                    >
+                        <option value={0}>January</option>
+                        <option value={1}>February</option>
+                        <option value={2}>March</option>
+                        <option value={3}>April</option>
+                        <option value={4}>May</option>
+                        <option value={5}>June</option>
+                        <option value={6}>July</option>
+                        <option value={7}>August</option>
+                        <option value={8}>September</option>
+                        <option value={9}>October</option>
+                        <option value={10}>November</option>
+                        <option value={11}>December</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="space-y-4">
+                <label class="block">
+                    <div class="text-xs text-slate-600">Additional Payment 2</div>
+                    <input
+                        type="number"
+                        bind:value={additionalPayment2}
+                        class="mt-2 w-full p-2 border rounded"
+                        placeholder="0"
+                    />
+                </label>
+                <label class="block">
+                    <div class="text-xs text-slate-600">Payment Month 2</div>
+                    <select
+                        bind:value={additionalPaymentMonth2}
+                        class="mt-2 w-full p-2 border rounded"
+                    >
+                        <option value={0}>January</option>
+                        <option value={1}>February</option>
+                        <option value={2}>March</option>
+                        <option value={3}>April</option>
+                        <option value={4}>May</option>
+                        <option value={5}>June</option>
+                        <option value={6}>July</option>
+                        <option value={7}>August</option>
+                        <option value={8}>September</option>
+                        <option value={9}>October</option>
+                        <option value={10}>November</option>
+                        <option value={11}>December</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="space-y-4">
+                <label class="block">
+                    <div class="text-xs text-slate-600">Additional Payment 3</div>
+                    <input
+                        type="number"
+                        bind:value={additionalPayment3}
+                        class="mt-2 w-full p-2 border rounded"
+                        placeholder="0"
+                    />
+                </label>
+                <label class="block">
+                    <div class="text-xs text-slate-600">Payment Month 3</div>
+                    <select
+                        bind:value={additionalPaymentMonth3}
+                        class="mt-2 w-full p-2 border rounded"
+                    >
+                        <option value={0}>January</option>
+                        <option value={1}>February</option>
+                        <option value={2}>March</option>
+                        <option value={3}>April</option>
+                        <option value={4}>May</option>
+                        <option value={5}>June</option>
+                        <option value={6}>July</option>
+                        <option value={7}>August</option>
+                        <option value={8}>September</option>
+                        <option value={9}>October</option>
+                        <option value={10}>November</option>
+                        <option value={11}>December</option>
+                    </select>
+                </label>
+            </div>
         </div>
 
         <div class="mb-10">
